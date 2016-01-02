@@ -10,6 +10,7 @@ use Data::Dumper;
 use DMB::Tools ':all';
 use Term::ReadLine;
 use JSON;
+use App::RPGTool::Classes;
 
 my $json = JSON->new->allow_nonref->pretty;
 
@@ -62,6 +63,10 @@ sub new {
     if ( $args{use_test_database} ) {
         $freeze_file = "$ENV{HOME}/.rpgtool.t";
     }
+
+    my $mychar  = App::RPGTool::Character->new(player=>'Bobby');
+    my $monster = App::RPGTool::Monster->new(x => 5, y => 42, z => -5);
+
     my $self = {
         use_test_database => $args{use_test_database},
     };
@@ -166,9 +171,7 @@ sub deactivate {
     return $self->set_flag($char,$INACTIVE);
 }
 
-#     1 = active
-#     0 = inactive
-# undef = does not exist
+# 1: active   0: inactive   undef: does not exist
 sub is_active {
     my ($self,$char) = @_;
     if ( exists $database->{chars}->{$char} ) {
@@ -268,7 +271,6 @@ sub run {
         $line = $_;    # Make a copy so we can abuse it
         $line =~ s/(\S+)\s?//;
         my $first_word = $1 || '';
-#        $subs{$first_word}->{code}->($line) if $subs{$first_word};
         if ($subs{$first_word}) {
             my $coderef = $subs{$first_word}->{code};
             $coderef->($self,$line);
